@@ -1,5 +1,8 @@
 package com.w2a.base;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -13,33 +16,25 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Properties;
-import java.util.logging.Logger;
+
 
 public class TestBase {
 
-    /*
-        Webdriver
-        Properties
-        Logs
-        ExtentReports
-        DB
-        Excel
-        Mail
-     */
+
     public static WebDriver driver;
     public static WebDriverWait wait;
     final static public String separator = File.separator;
     final static public String propertiesBasePath = System.getProperty("user.dir") + separator;
-    public static Logger log = Logger.getLogger("devpinoyLogger");
+    private static final Logger log = LogManager.getLogger("test");
+    private Properties or;
 
-
-    private Properties getConfigProperties() {
+    private Properties getConfig() {
         var fileLocation = propertiesBasePath + "src" + separator + "test" + separator + "resources" + separator + "properties" + separator + "config.properties";
         return loadProperties(fileLocation);
     }
 
     private Properties getORProperties() {
-        var fileLocation = propertiesBasePath + "src" + separator + "test" + separator + "resources" + separator + "properties" + separator + "config.properties";
+        var fileLocation = propertiesBasePath + "src" + separator + "test" + separator + "resources" + separator + "properties" + separator + "OR.properties";
         return loadProperties(fileLocation);
     }
 
@@ -52,9 +47,14 @@ public class TestBase {
             System.out.println("File Location: " + fileLocation);
             System.out.println("Error while reading the properties");
         }
-
         return properties;
+    }
 
+    public void click(String locator) {
+        System.out.println(or.getProperty(locator));
+
+        driver.findElement(By.xpath(or.getProperty(locator)))
+                .click();
     }
 
 
@@ -62,14 +62,18 @@ public class TestBase {
     public void setUp() {
 
         if (driver == null) {
-            Properties orProperties = getORProperties();
-            Properties configProperties = getConfigProperties();
+            or = getORProperties();
+            Properties config = getConfig();
             log.info("config and or properties loaded");
 
-            switch (configProperties.getProperty("browser")) {
+            switch (config.getProperty("browser")) {
                 case "chrome":
+                    var chromeDriverPath = String.format("src%1$stest%1$sresources%1$sexecutables%1$schromedriver.exe", separator);
+                    System.setProperty("webdriver.chrome.driver", propertiesBasePath + chromeDriverPath);
                     driver = new ChromeDriver();
                     log.info("chrome launched");
+                    log.debug("test");
+                    log.info("Test chrome launched");
                     break;
                 case "firefox":
                     driver = new FirefoxDriver();
@@ -81,19 +85,21 @@ public class TestBase {
                     break;
             }
 
-            driver.get(configProperties.getProperty("testsiteurl"));
-            log.info("Navigated to :" + configProperties.get("testsiteurl"));
+            driver.get(config.getProperty("testsiteurl"));
+            log.info("Navigated to :{}", config.get("testsiteurl"));
             driver.manage().window().maximize();
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
             wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-
-
         }
 
     }
 
     @AfterSuite
     public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
 
+        log.info("test execution completed");
     }
 }

@@ -23,6 +23,12 @@
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.23.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>2.23.1</version>
         </dependency>
@@ -89,6 +95,7 @@
             <version>42.7.3</version>
         </dependency>
 
+
     </dependencies>
 
     <build>
@@ -106,14 +113,14 @@
             </plugin>
         </plugins>
 
-        <testResources>
-            <testResource>
-                <directory>src/test/resources/properties</directory>
-                <includes>
-                    <include>log4j.properties</include>
-                </includes>
-            </testResource>
-        </testResources>
+<!--        <testResources>-->
+<!--            <testResource>-->
+<!--                <directory>src/test/resources/properties/</directory>-->
+<!--                <includes>-->
+<!--                    <include>log4j2.properties</include>-->
+<!--                </includes>-->
+<!--            </testResource>-->
+<!--        </testResources>-->
     </build>
 
     <properties>

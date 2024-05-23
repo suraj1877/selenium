@@ -9,18 +9,8 @@ public class TestProperties {
 
     public static void main(String[] args) {
 
-        Properties config = new Properties();
-        final var separator = File.separator;
-        final var basePath = System.getProperty("user.dir");
-        final var fileLocation = basePath + separator + "src" + separator + "test" + separator + "resources" + separator + "properties" + separator + "config.properties";
-
-        try (var fis = new FileInputStream(fileLocation)) {
-            config.load(fis);
-            System.out.println(config.getProperty("browser"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+       String value = String.format("src%1$stest%1$ssresources%1$sexecutables%1$schromedriver.exe","/");
+        System.out.println(value);
 
     }
 }
