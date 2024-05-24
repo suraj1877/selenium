@@ -68,12 +68,8 @@ public class TestBase {
 
             switch (config.getProperty("browser")) {
                 case "chrome":
-                    var chromeDriverPath = String.format("src%1$stest%1$sresources%1$sexecutables%1$schromedriver.exe", separator);
-                    System.setProperty("webdriver.chrome.driver", propertiesBasePath + chromeDriverPath);
-                    driver = new ChromeDriver();
-                    log.info("chrome launched");
-                    log.debug("test");
-                    log.info("Test chrome launched");
+                    driver = new ChromeRunner().getDriver();
+
                     break;
                 case "firefox":
                     driver = new FirefoxDriver();
