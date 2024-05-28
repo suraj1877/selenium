@@ -1,10 +1,9 @@
 package com.w2a.base;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import com.w2a.logger.LoggerConfig;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -16,16 +15,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 
 public class TestBase {
 
 
+    public static Logger log = Logger.getLogger(TestBase.class.getName());
+
+    static {
+        LoggerConfig.initLogger(TestBase.class.getName());
+    }
+
     public static WebDriver driver;
     public static WebDriverWait wait;
     final static public String separator = File.separator;
     final static public String propertiesBasePath = System.getProperty("user.dir") + separator;
-    private static final Logger log = LogManager.getLogger("test");
     private Properties or;
 
     private Properties getConfig() {
@@ -44,17 +49,17 @@ public class TestBase {
         try (var fis = new FileInputStream(fileLocation)) {
             properties.load(fis);
         } catch (IOException e) {
-            System.out.println("File Location: " + fileLocation);
-            System.out.println("Error while reading the properties");
+            log.severe("Error while reading the Properties file " + e);
+            log.severe("File Location: " + fileLocation);
+            e.fillInStackTrace();
         }
         return properties;
     }
 
     public void click(String locator) {
-        System.out.println(or.getProperty(locator));
-
         driver.findElement(By.xpath(or.getProperty(locator)))
                 .click();
+        log.info("Element clicked " + locator);
     }
 
 
@@ -64,12 +69,12 @@ public class TestBase {
         if (driver == null) {
             or = getORProperties();
             Properties config = getConfig();
-            log.info("config and or properties loaded");
+            log.info("Config and OR properties loaded");
 
             switch (config.getProperty("browser")) {
                 case "chrome":
                     driver = new ChromeRunner().getDriver();
-
+                    log.info("chrome launched");
                     break;
                 case "firefox":
                     driver = new FirefoxDriver();
@@ -82,7 +87,7 @@ public class TestBase {
             }
 
             driver.get(config.getProperty("testsiteurl"));
-            log.info("Navigated to :{}", config.get("testsiteurl"));
+            log.info("Navigated to : " + config.get("testsiteurl"));
             driver.manage().window().maximize();
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
             wait = new WebDriverWait(driver, Duration.ofSeconds(5));
